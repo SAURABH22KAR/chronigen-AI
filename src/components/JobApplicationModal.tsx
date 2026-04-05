@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, Loader } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface JobApplicationModalProps {
   jobId: string;
@@ -40,6 +41,21 @@ export default function JobApplicationModal({
     setSubmitMessage(null);
 
     try {
+      const { error } = await supabase.from('job_applications').insert([
+        {
+          job_id: jobId,
+          job_title: jobTitle,
+          full_name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          linkedin_profile: formData.linkedinProfile || null,
+          resume_url: formData.resumeUrl || null,
+          cover_letter: formData.coverLetter || null,
+        },
+      ]);
+
+      if (error) throw error;
+
       setSubmitMessage({
         type: 'success',
         text: 'Application submitted successfully! We will review your application and get back to you soon.',
