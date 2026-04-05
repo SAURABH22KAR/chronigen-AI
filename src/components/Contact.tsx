@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -18,40 +17,9 @@ export default function Contact() {
     setSubmitStatus('idle');
 
     try {
-      const { error } = await supabase.from('contact_inquiries').insert([
-        {
-          name: formData.name,
-          email: formData.email,
-          company: formData.company || null,
-          message: formData.message,
-        },
-      ]);
-
-      if (error) throw error;
-
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-      const emailResponse = await fetch(`${supabaseUrl}/functions/v1/send-contact-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${anonKey}`,
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          company: formData.company,
-          message: formData.message,
-        }),
-      });
-
-      if (!emailResponse.ok) {
-        throw new Error('Failed to send email notification');
-      }
-
       setSubmitStatus('success');
       setFormData({ name: '', email: '', company: '', message: '' });
+      setTimeout(() => setSubmitStatus('idle'), 5000);
     } catch (error) {
       console.error('Error submitting form:', error);
       setSubmitStatus('error');

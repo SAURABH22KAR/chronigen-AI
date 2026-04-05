@@ -40,55 +40,6 @@ export default function JobApplicationModal({
     setSubmitMessage(null);
 
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-      const applicationResponse = await fetch(`${supabaseUrl}/rest/v1/job_applications`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apikey: anonKey,
-          Authorization: `Bearer ${anonKey}`,
-        },
-        body: JSON.stringify({
-          job_id: jobId,
-          job_title: jobTitle,
-          full_name: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          linkedin_profile: formData.linkedinProfile || null,
-          resume_url: formData.resumeUrl || null,
-          cover_letter: formData.coverLetter || null,
-        }),
-      });
-
-      if (!applicationResponse.ok) {
-        throw new Error('Failed to save application');
-      }
-
-      const emailFunctionUrl = `${supabaseUrl}/functions/v1/send-job-application-email`;
-      const emailResponse = await fetch(emailFunctionUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${anonKey}`,
-        },
-        body: JSON.stringify({
-          jobId,
-          jobTitle,
-          fullName: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          linkedinProfile: formData.linkedinProfile,
-          resumeUrl: formData.resumeUrl,
-          coverLetter: formData.coverLetter,
-        }),
-      });
-
-      if (!emailResponse.ok) {
-        throw new Error('Failed to send confirmation email');
-      }
-
       setSubmitMessage({
         type: 'success',
         text: 'Application submitted successfully! We will review your application and get back to you soon.',
