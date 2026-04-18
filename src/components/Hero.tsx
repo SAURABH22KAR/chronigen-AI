@@ -22,14 +22,11 @@ export default function Hero() {
             <span className="text-blue-400 text-sm font-medium">Next-Generation AI Platform</span>
           </div>
 
-          {/* Logo + Title */}
-          <div className="flex flex-col items-center gap-4 mb-6">
-            <img src="/chronigen-icon.png" alt="Chronigen" className="h-24 w-24 md:h-28 md:w-28 mix-blend-screen drop-shadow-[0_0_30px_rgba(59,130,246,0.5)]" />
-            <h1 className="text-6xl md:text-8xl font-extrabold tracking-widest leading-none">
-              <span className="text-white">CHRON</span>
-              <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent">IGEN</span>
-            </h1>
-          </div>
+          {/* Title */}
+          <h1 className="text-6xl md:text-8xl font-extrabold mb-6 tracking-tight leading-none">
+            <span className="text-white">CHRON</span>
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">IGEN</span>
+          </h1>
 
           <p className="text-xl md:text-2xl text-slate-300 mb-4 max-w-3xl mx-auto font-medium">
             Powering the Future with Intelligent AI Solutions

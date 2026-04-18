@@ -30,12 +30,9 @@ export default function Navbar() {
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <img src="/chronigen-icon.png" alt="Chronigen" className="h-9 w-9 mix-blend-screen group-hover:scale-110 transition-transform duration-200" />
-            <span className="text-lg font-bold tracking-widest">
-              <span className="text-white">CHRON</span>
-              <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">IGEN</span>
-            </span>
+          <Link to="/" className="flex items-center space-x-3 group">
+            <img src="/Chronigen.png" alt="Chronigen" className="h-8 w-8 group-hover:scale-110 transition-transform duration-200" />
+            <span className="text-xl font-bold text-white tracking-wide">CHRONIGEN</span>
           </Link>
 
           <div className="hidden md:flex items-center space-x-1">
