@@ -1,108 +1,163 @@
-import { Bot, MessageSquare, Sparkles, ArrowRight, Zap } from 'lucide-react';
+import { ArrowRight, Sparkles, Bot, MessageSquare, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+
+const typingWords = ['AI Agents', 'Smart Chatbots', 'Automation', 'Intelligence'];
 
 export default function Hero() {
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [displayed, setDisplayed] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = typingWords[phraseIndex];
+    const timeout = setTimeout(
+      () => {
+        if (!isDeleting) {
+          setDisplayed(current.slice(0, displayed.length + 1));
+          if (displayed.length + 1 === current.length) {
+            setTimeout(() => setIsDeleting(true), 1800);
+          }
+        } else {
+          setDisplayed(current.slice(0, displayed.length - 1));
+          if (displayed.length - 1 === 0) {
+            setIsDeleting(false);
+            setPhraseIndex((p) => (p + 1) % typingWords.length);
+          }
+        }
+      },
+      isDeleting ? 45 : 90
+    );
+    return () => clearTimeout(timeout);
+  }, [displayed, isDeleting, phraseIndex]);
+
+  const stats = [
+    { value: '500+', label: 'Businesses Served' },
+    { value: '99.9%', label: 'Uptime SLA' },
+    { value: '10x', label: 'Faster Operations' },
+    { value: '24/7', label: 'AI Support' },
+  ];
+
+  const techTags = ['GPT-4o', 'Claude AI', 'LangChain', 'Python', 'AWS', 'Gemini'];
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-900 pt-16">
-      {/* Gradient orbs */}
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden mesh-gradient pt-16">
+      {/* Grid overlay */}
+      <div className="absolute inset-0 grid-bg opacity-100 pointer-events-none" />
+
+      {/* Floating orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-48 -right-48 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-3xl animate-pulse animation-delay-2000" />
-        <div className="absolute -bottom-48 -left-48 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-blue-500/5 rounded-full blur-3xl" />
+        <div className="orb w-[600px] h-[600px] bg-purple-600/10 -top-64 -right-64 animate-float-slow" />
+        <div className="orb w-[500px] h-[500px] bg-blue-600/10 -bottom-48 -left-48 animate-float animation-delay-2000" />
+        <div className="orb w-[300px] h-[300px] bg-cyan-500/8 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-float-delayed" />
       </div>
 
-      {/* Grid pattern */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40 pointer-events-none" />
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div className="text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-blue-600/10 border border-blue-500/30 rounded-full px-4 py-2 mb-8">
-            <Zap className="text-blue-400" size={14} />
-            <span className="text-blue-400 text-sm font-medium">Next-Generation AI Platform</span>
-          </div>
-
-          {/* Title */}
-          <h1 className="text-6xl md:text-8xl font-extrabold mb-6 tracking-tight leading-none">
-            <span className="text-white">CHRON</span>
-            <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">IGEN</span>
-          </h1>
-
-          <p className="text-xl md:text-2xl text-slate-300 mb-4 max-w-3xl mx-auto font-medium">
-            Powering the Future with Intelligent AI Solutions
-          </p>
-
-          <p className="text-base md:text-lg text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Transform your business with cutting-edge AI agents and chatbots that deliver real, measurable results — faster than ever.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
-            <Link
-              to="/contact"
-              className="group flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 shadow-lg shadow-blue-600/30 hover:shadow-blue-500/40 hover:scale-105"
-            >
-              Get Started Today
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform duration-200" />
-            </Link>
-            <Link
-              to="/services"
-              className="flex items-center gap-2 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-200 hover:bg-slate-800/50"
-            >
-              Explore Services
-            </Link>
-          </div>
-
-          {/* Stats bar */}
-          <div className="flex flex-wrap items-center justify-center gap-8 mb-20">
-            {[
-              { value: '500+', label: 'Businesses Served' },
-              { value: '99.9%', label: 'Uptime SLA' },
-              { value: '1000+', label: 'AI Models Deployed' },
-              { value: '24/7', label: 'Expert Support' },
-            ].map((stat, i) => (
-              <div key={i} className="flex items-center gap-8">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">{stat.value}</div>
-                  <div className="text-slate-400 text-sm mt-0.5">{stat.label}</div>
-                </div>
-                {i < 3 && <div className="hidden sm:block w-px h-10 bg-slate-700/60" />}
-              </div>
-            ))}
-          </div>
-
-          {/* Feature cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto">
-            {[
-              {
-                icon: Bot,
-                title: 'AI Agents',
-                description: 'Autonomous intelligent agents that work 24/7 to automate complex tasks',
-              },
-              {
-                icon: MessageSquare,
-                title: 'Chatbots',
-                description: 'Conversational AI that delights customers and drives deeper engagement',
-              },
-              {
-                icon: Sparkles,
-                title: 'Custom Solutions',
-                description: 'Tailored AI systems built specifically for your unique business needs',
-              },
-            ].map(({ icon: Icon, title, description }, i) => (
-              <div
-                key={i}
-                className="group bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:border-blue-500/40 hover:bg-slate-800/60 transition-all duration-200 hover:-translate-y-1"
-              >
-                <div className="bg-blue-600/10 border border-blue-500/20 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-600/20 transition-colors">
-                  <Icon className="text-blue-400" size={22} />
-                </div>
-                <h3 className="text-white text-lg font-semibold mb-2">{title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{description}</p>
-              </div>
-            ))}
-          </div>
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-1.5 mb-8 animate-fade-in">
+          <Sparkles size={13} className="text-purple-400" />
+          <span className="text-purple-300 text-sm font-medium">Next-Generation AI Platform</span>
+          <span className="bg-purple-500/20 text-purple-300 text-xs px-2 py-0.5 rounded-full">2025</span>
         </div>
+
+        {/* Headline */}
+        <h1 className="text-5xl sm:text-7xl md:text-8xl font-extrabold tracking-tight leading-[1.05] mb-6 animate-fade-in animation-delay-200">
+          <span className="text-white">Supercharge Your</span>
+          <br />
+          <span className="text-white">Business With </span>
+          <span className="gradient-text typing-cursor">{displayed}</span>
+        </h1>
+
+        <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in animation-delay-400">
+          Deploy enterprise-grade AI agents and chatbots that automate workflows,
+          delight customers, and drive measurable ROI — live in days, not months.
+        </p>
+
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fade-in animation-delay-600">
+          <Link
+            to="/contact"
+            className="group btn-gradient flex items-center gap-2.5 text-white px-8 py-4 rounded-xl text-base font-semibold shadow-lg shadow-purple-900/30"
+          >
+            Start for Free
+            <ArrowRight size={17} className="group-hover:translate-x-1 transition-transform duration-200" />
+          </Link>
+          <Link
+            to="/services"
+            className="flex items-center gap-2 border border-white/10 bg-white/5 hover:bg-white/10 text-white px-8 py-4 rounded-xl text-base font-semibold transition-all duration-200 backdrop-blur-sm"
+          >
+            Explore Solutions
+          </Link>
+        </div>
+
+        {/* Tech tags */}
+        <div className="flex flex-wrap gap-2 justify-center mb-16 animate-fade-in animation-delay-800">
+          {techTags.map((tag) => (
+            <span
+              key={tag}
+              className="glass text-slate-300 text-xs font-medium px-3 py-1.5 rounded-full hover:border-purple-500/40 hover:text-purple-300 transition-all duration-200 cursor-default"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-16 animate-fade-in animation-delay-1000">
+          {stats.map((stat, i) => (
+            <div
+              key={i}
+              className="glow-card rounded-2xl p-5 flex flex-col items-center"
+            >
+              <div className="text-3xl font-extrabold gradient-text mb-1">{stat.value}</div>
+              <div className="text-slate-400 text-xs">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Feature mini cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto animate-fade-in animation-delay-1200">
+          {[
+            { icon: Bot, title: 'AI Agents', desc: 'Autonomous 24/7 task automation', color: 'purple' },
+            { icon: MessageSquare, title: 'AI Chatbots', desc: 'Intelligent customer conversations', color: 'blue' },
+            { icon: Sparkles, title: 'Custom AI', desc: 'Tailored solutions for your needs', color: 'cyan' },
+          ].map(({ icon: Icon, title, desc, color }, i) => (
+            <div
+              key={i}
+              className="glow-card rounded-2xl p-5 flex items-start gap-3 text-left"
+            >
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                  color === 'purple'
+                    ? 'bg-purple-500/15 border border-purple-500/20'
+                    : color === 'blue'
+                    ? 'bg-blue-500/15 border border-blue-500/20'
+                    : 'bg-cyan-500/15 border border-cyan-500/20'
+                }`}
+              >
+                <Icon
+                  size={18}
+                  className={
+                    color === 'purple'
+                      ? 'text-purple-400'
+                      : color === 'blue'
+                      ? 'text-blue-400'
+                      : 'text-cyan-400'
+                  }
+                />
+              </div>
+              <div>
+                <div className="text-white text-sm font-semibold mb-0.5">{title}</div>
+                <div className="text-slate-400 text-xs">{desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-slate-500 animate-bounce-slow">
+        <ChevronDown size={20} />
       </div>
     </section>
   );

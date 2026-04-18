@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ChatBot from './components/ChatBot';
 import Home from './pages/Home';
 import Services from './pages/Services';
 import AIAgents from './pages/AIAgents';
@@ -13,7 +14,7 @@ import Admin from './pages/Admin';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-slate-900 flex flex-col">
+      <div className="min-h-screen flex flex-col" style={{ background: '#030712' }}>
         <Navbar />
         <main className="flex-1">
           <Routes>
@@ -28,6 +29,7 @@ function App() {
           </Routes>
         </main>
         <Footer />
+        <ChatBot />
       </div>
     </Router>
   );
