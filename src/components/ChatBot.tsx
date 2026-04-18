@@ -26,7 +26,7 @@ function getBotResponse(input: string): string {
     return "Our **AI Chatbots** feature:\n\n✅ Natural language understanding (GPT-4 powered)\n✅ Multi-channel: web, mobile, WhatsApp, Slack\n✅ 98% customer satisfaction rate\n✅ Instant 24/7 responses\n✅ Seamless handoff to human agents\n✅ Full analytics dashboard\n\nReduce support costs by 60% while improving satisfaction!";
 
   if (/contact|reach|email|phone|talk to (a )?(human|person|team|someone)|sales/.test(t))
-    return "You can reach our team at:\n\n📧 hello@chronigen.ai\n📞 +1 (555) 123-4567\n📍 San Francisco, CA\n\nOr visit our **Contact page** to send a message. We respond within 24 hours — usually much faster!";
+    return "You can reach our team at:\n\n📧 chronigenai@gmail.com\n📞 +91 9604788111\n📍 Chh Sambhaji Nagar, MH, India\n\nOr visit our **Contact page** to send a message. We respond within 24 hours — usually much faster!";
 
   if (/start|begin|get started|sign up|onboard|demo|trial|pilot/.test(t))
     return "Getting started is easy! 🚀\n\n1. **Free 30-min Consultation** — Tell us your goals\n2. **Solution Design** — We architect your AI system\n3. **Rapid Deployment** — Live within 48 hours\n4. **Ongoing Support** — We're with you 24/7\n\nNo long contracts. See results before you commit. Ready to start?";

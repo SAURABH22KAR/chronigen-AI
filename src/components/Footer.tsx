@@ -20,7 +20,7 @@ const socialLinks = [
   { icon: Twitter, href: '#', label: 'Twitter' },
   { icon: Linkedin, href: '#', label: 'LinkedIn' },
   { icon: Github, href: '#', label: 'GitHub' },
-  { icon: Mail, href: 'mailto:hello@chronigen.ai', label: 'Email' },
+  { icon: Mail, href: 'mailto:chronigenai@gmail.com', label: 'Email' },
 ];
 
 export default function Footer() {
@@ -57,15 +57,15 @@ export default function Footer() {
             <div className="space-y-2 mb-6">
               <div className="flex items-center gap-2 text-slate-500 text-xs">
                 <Mail size={12} className="text-purple-400" />
-                <span>hello@chronigen.ai</span>
+                <span>chronigenai@gmail.com</span>
               </div>
               <div className="flex items-center gap-2 text-slate-500 text-xs">
                 <Phone size={12} className="text-blue-400" />
-                <span>+1 (555) 123-4567</span>
+                <span>+91 9604788111</span>
               </div>
               <div className="flex items-center gap-2 text-slate-500 text-xs">
                 <MapPin size={12} className="text-cyan-400" />
-                <span>San Francisco, CA</span>
+                <span>Chh Sambhaji Nagar, MH, India</span>
               </div>
             </div>
 

@@ -23,7 +23,7 @@ export default function CareersPage() {
       id: 'senior-ai-engineer',
       title: 'Senior AI/ML Engineer',
       department: 'Engineering',
-      location: 'San Francisco, CA / Remote',
+      location: 'Chh Sambhaji Nagar, MH, India / Remote',
       type: 'Full-time',
       salary: '$180,000 - $220,000',
       description: 'Lead the development of our next-generation AI models and infrastructure. Work with cutting-edge technologies to build scalable ML systems.',
