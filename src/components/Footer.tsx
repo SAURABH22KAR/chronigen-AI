@@ -27,9 +27,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
           {/* Brand */}
           <div className="md:col-span-2">
-            <Link to="/" className="flex items-center space-x-3 mb-4 group w-fit">
-              <img src="/Chronigen.png" alt="Chronigen" className="h-8 w-8 group-hover:scale-110 transition-transform duration-200" />
-              <span className="text-xl font-bold text-white tracking-wide">CHRONIGEN</span>
+            <Link to="/" className="flex items-center mb-4 group w-fit">
+              <img src="/chronigen-logo.png" alt="Chronigen" className="h-10 group-hover:scale-105 transition-transform duration-200" />
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
               Empowering businesses with intelligent AI solutions for a smarter, more efficient future.

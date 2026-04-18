@@ -16,17 +16,16 @@ export default function Hero() {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="text-center">
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <img src="/chronigen-logo.png" alt="Chronigen" className="h-16 md:h-20 drop-shadow-2xl" />
+          </div>
+
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-blue-600/10 border border-blue-500/30 rounded-full px-4 py-2 mb-8">
             <Zap className="text-blue-400" size={14} />
             <span className="text-blue-400 text-sm font-medium">Next-Generation AI Platform</span>
           </div>
-
-          {/* Title */}
-          <h1 className="text-6xl md:text-8xl font-extrabold mb-6 tracking-tight leading-none">
-            <span className="text-white">CHRON</span>
-            <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">IGEN</span>
-          </h1>
 
           <p className="text-xl md:text-2xl text-slate-300 mb-4 max-w-3xl mx-auto font-medium">
             Powering the Future with Intelligent AI Solutions
