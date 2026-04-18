@@ -1,6 +1,75 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Mail, Trash2, RefreshCw } from 'lucide-react';
+import { Mail, Trash2, RefreshCw, Lock, Eye, EyeOff } from 'lucide-react';
+
+const ADMIN_PASSWORD = 'chronigen@admin';
+
+function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
+  const [value, setValue] = useState('');
+  const [show, setShow] = useState(false);
+  const [error, setError] = useState(false);
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (value === ADMIN_PASSWORD) {
+      onUnlock();
+    } else {
+      setError(true);
+      setValue('');
+      setTimeout(() => setError(false), 2000);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#030712' }}>
+      <div className="w-full max-w-sm">
+        <div className="glow-card rounded-2xl p-8">
+          <div className="flex justify-center mb-6">
+            <div className="w-14 h-14 rounded-2xl btn-gradient flex items-center justify-center">
+              <Lock size={24} className="text-white" />
+            </div>
+          </div>
+          <h1 className="text-2xl font-extrabold text-white text-center mb-1">Admin Access</h1>
+          <p className="text-slate-500 text-sm text-center mb-8">Enter the admin password to continue</p>
+
+          <form onSubmit={submit} className="space-y-4">
+            <div className="relative">
+              <input
+                type={show ? 'text' : 'password'}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                placeholder="Password"
+                autoFocus
+                className={`w-full bg-white/5 border rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none transition-colors pr-11 ${
+                  error ? 'border-red-500/60 focus:border-red-500' : 'border-white/10 focus:border-purple-500/50'
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShow((s) => !s)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+              >
+                {show ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+
+            {error && (
+              <p className="text-red-400 text-xs text-center">Incorrect password. Try again.</p>
+            )}
+
+            <button
+              type="submit"
+              className="w-full btn-gradient text-white font-semibold py-3 rounded-xl text-sm transition-opacity disabled:opacity-40"
+              disabled={!value}
+            >
+              Unlock Dashboard
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface ContactInquiry {
   id: string;
@@ -25,43 +94,37 @@ interface JobApplication {
 }
 
 export default function AdminPage() {
+  const [unlocked, setUnlocked] = useState(false);
   const [contactSubmissions, setContactSubmissions] = useState<ContactInquiry[]>([]);
   const [jobApplications, setJobApplications] = useState<JobApplication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'contact' | 'jobs'>('contact');
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchSubmissions();
-  }, []);
-
   const fetchSubmissions = async () => {
     setIsLoading(true);
     setError(null);
     try {
       const [contactData, jobsData] = await Promise.all([
-        supabase
-          .from('contact_inquiries')
-          .select('*')
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('job_applications')
-          .select('*')
-          .order('created_at', { ascending: false }),
+        supabase.from('contact_inquiries').select('*').order('created_at', { ascending: false }),
+        supabase.from('job_applications').select('*').order('created_at', { ascending: false }),
       ]);
-
       if (contactData.error) throw contactData.error;
       if (jobsData.error) throw jobsData.error;
-
       setContactSubmissions(contactData.data || []);
       setJobApplications(jobsData.data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load submissions');
-      console.error('Error fetching submissions:', err);
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (unlocked) fetchSubmissions();
+  }, [unlocked]);
+
+  if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
 
   const deleteContactSubmission = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this submission?')) return;
