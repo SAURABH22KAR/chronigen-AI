@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
-import AdminPage from './pages/admin'; // Make sure this path is correct
+import AdminPage from './pages/Admin';
 import './index.css';
 
 const router = createBrowserRouter([
