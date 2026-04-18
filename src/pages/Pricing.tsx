@@ -92,10 +92,10 @@ const faqs = [
   },
 ];
 
-const colorMap: Record<string, { border: string; icon: string; badge: string; glow: string }> = {
-  blue:   { border: 'border-blue-500/30',   icon: 'text-blue-400',   badge: 'bg-blue-500/10 text-blue-300 border-blue-500/30',   glow: 'hover:border-blue-500/50 hover:shadow-blue-500/10' },
-  purple: { border: 'border-purple-500/50', icon: 'text-purple-400', badge: 'bg-purple-500/10 text-purple-300 border-purple-500/30', glow: 'hover:border-purple-500/60 hover:shadow-purple-500/15' },
-  cyan:   { border: 'border-cyan-500/30',   icon: 'text-cyan-400',   badge: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',   glow: 'hover:border-cyan-500/50 hover:shadow-cyan-500/10' },
+const colorMap: Record<string, { border: string; icon: string; glow: string }> = {
+  blue:   { border: 'border-blue-500/30',   icon: 'text-blue-400',   glow: 'hover:border-blue-500/50 hover:shadow-blue-500/10' },
+  purple: { border: 'border-purple-500/50', icon: 'text-purple-400', glow: 'hover:border-purple-500/60 hover:shadow-purple-500/15' },
+  cyan:   { border: 'border-cyan-500/30',   icon: 'text-cyan-400',   glow: 'hover:border-cyan-500/50 hover:shadow-cyan-500/10' },
 };
 
 function FAQItem({ q, a }: { q: string; a: string }) {
@@ -109,9 +109,74 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         {q}
         <ChevronDown size={16} className={`text-slate-400 transition-transform duration-200 flex-shrink-0 ml-4 ${open ? 'rotate-180' : ''}`} />
       </button>
-      <div className={`overflow-hidden transition-all duration-300 ${open ? 'max-h-40' : 'max-h-0'}`}>
+      <div className={`overflow-hidden transition-all duration-300 ${open ? 'max-h-64' : 'max-h-0'}`}>
         <p className="px-6 pb-5 text-slate-400 text-sm leading-relaxed">{a}</p>
       </div>
+    </div>
+  );
+}
+
+function PricingCard({ plan, annual, index }: { plan: typeof plans[0]; annual: boolean; index: number }) {
+  const { ref, inView } = useInView();
+  const c = colorMap[plan.color];
+  const displayPrice = plan.price
+    ? annual ? Math.round(plan.price * 10 / 12) : plan.price
+    : null;
+
+  return (
+    <div
+      ref={ref}
+      style={{ animationDelay: `${index * 100}ms` }}
+      className={`relative rounded-2xl p-7 border flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${c.border} ${c.glow} ${
+        inView ? 'opacity-100 animate-fade-in-up' : 'opacity-0'
+      } ${plan.popular ? 'bg-[#0d1424]' : 'bg-[#030712]'}`}
+    >
+      {plan.popular && (
+        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+          <span className="btn-gradient text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap">
+            Most Popular
+          </span>
+        </div>
+      )}
+
+      <div className="mb-6">
+        <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 bg-white/5 border ${c.border}`}>
+          <plan.icon size={20} className={c.icon} />
+        </div>
+        <h3 className="text-xl font-extrabold text-white mb-1">{plan.name}</h3>
+        <p className="text-slate-400 text-sm leading-relaxed">{plan.description}</p>
+      </div>
+
+      <div className="mb-8">
+        {displayPrice ? (
+          <div className="flex items-end gap-1.5">
+            <span className="text-4xl font-extrabold text-white">${displayPrice.toLocaleString()}</span>
+            <span className="text-slate-500 text-sm mb-1.5">/mo{annual ? ' · billed annually' : ''}</span>
+          </div>
+        ) : (
+          <div className="text-4xl font-extrabold text-white">Custom</div>
+        )}
+      </div>
+
+      <ul className="space-y-3 mb-8 flex-1">
+        {plan.features.map((f) => (
+          <li key={f} className="flex items-start gap-2.5 text-sm text-slate-300">
+            <Check size={15} className={`${c.icon} flex-shrink-0 mt-0.5`} />
+            {f}
+          </li>
+        ))}
+      </ul>
+
+      <Link
+        to="/contact"
+        className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+          plan.popular
+            ? 'btn-gradient text-white hover:opacity-90'
+            : 'border border-white/10 bg-white/5 text-white hover:bg-white/10'
+        }`}
+      >
+        {plan.cta}
+      </Link>
     </div>
   );
 }
@@ -164,69 +229,9 @@ export default function Pricing() {
       {/* Pricing cards */}
       <section className="pb-24 px-4">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-          {plans.map((plan, i) => {
-            const c = colorMap[plan.color];
-            const { ref, inView } = useInView();
-            const displayPrice = plan.price ? (annual ? Math.round(plan.price * 10 / 12) : plan.price) : null;
-
-            return (
-              <div
-                key={plan.name}
-                ref={ref}
-                style={{ animationDelay: `${i * 100}ms` }}
-                className={`relative rounded-2xl p-7 border flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${c.border} ${c.glow} ${
-                  inView ? 'opacity-100 animate-fade-in-up' : 'opacity-0'
-                } ${plan.popular ? 'bg-[#0d1424]' : 'bg-white/2'}`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="btn-gradient text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-
-                <div className="mb-6">
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 bg-white/5 border ${c.border}`}>
-                    <plan.icon size={20} className={c.icon} />
-                  </div>
-                  <h3 className="text-xl font-extrabold text-white mb-1">{plan.name}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{plan.description}</p>
-                </div>
-
-                <div className="mb-8">
-                  {displayPrice ? (
-                    <div className="flex items-end gap-1.5">
-                      <span className="text-4xl font-extrabold text-white">${displayPrice.toLocaleString()}</span>
-                      <span className="text-slate-500 text-sm mb-1.5">/month{annual ? ' (billed annually)' : ''}</span>
-                    </div>
-                  ) : (
-                    <div className="text-4xl font-extrabold text-white">Custom</div>
-                  )}
-                </div>
-
-                <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm text-slate-300">
-                      <Check size={15} className={`${c.icon} flex-shrink-0 mt-0.5`} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  to="/contact"
-                  className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                    plan.popular
-                      ? 'btn-gradient text-white hover:opacity-90'
-                      : 'border border-white/10 bg-white/5 text-white hover:bg-white/10'
-                  }`}
-                >
-                  {plan.cta}
-                </Link>
-              </div>
-            );
-          })}
+          {plans.map((plan, i) => (
+            <PricingCard key={plan.name} plan={plan} annual={annual} index={i} />
+          ))}
         </div>
 
         {/* Trust bar */}
@@ -244,8 +249,8 @@ export default function Pricing() {
       </section>
 
       {/* FAQ */}
-      <section className="pb-28 px-4" style={{ background: '#03070f' }}>
-        <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+      <section className="relative pb-28 px-4" style={{ background: '#03070f' }}>
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
         <div
           ref={faqRef}
           className={`max-w-2xl mx-auto pt-20 transition-all duration-700 ${faqInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}

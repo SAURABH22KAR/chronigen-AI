@@ -85,11 +85,13 @@ export default function ROICalculator() {
     const roi = ((netSavings / chronigenCost) * 100);
     const paybackMonths = chronigenCost / (moneySavedPerYear / 12);
 
+    const roiNum = Math.round(Math.max(roi, 0));
     return {
       hoursSaved: Math.round(hoursSavedPerYear).toLocaleString(),
       moneySaved: Math.round(moneySavedPerYear).toLocaleString(),
       netSavings: Math.round(Math.max(netSavings, 0)).toLocaleString(),
-      roi: Math.round(Math.max(roi, 0)).toLocaleString(),
+      roi: roiNum.toLocaleString(),
+      roiNum,
       payback: paybackMonths < 1 ? '< 1 month' : `${Math.ceil(paybackMonths)} months`,
       positive: netSavings > 0,
     };
@@ -208,7 +210,7 @@ export default function ROICalculator() {
                 <div className="h-3 bg-white/5 rounded-full overflow-hidden">
                   <div
                     className="h-3 rounded-full bg-gradient-to-r from-purple-600 to-green-500 transition-all duration-700"
-                    style={{ width: `${Math.min((Number(results.roi.replace(/,/g, '')) / (Number(results.roi.replace(/,/g, '')) + 100)) * 100, 95)}%` }}
+                    style={{ width: `${Math.min((results.roiNum / (results.roiNum + 100)) * 100, 95)}%` }}
                   />
                 </div>
               </div>
