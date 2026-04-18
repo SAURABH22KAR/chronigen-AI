@@ -74,7 +74,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-white font-semibold mb-1">Email</h3>
-                  <p className="text-slate-400">contact@chronigen.ai</p>
+                  <p className="text-slate-400">chronigenai@gmail.com</p>
                 </div>
               </div>
 
@@ -84,7 +84,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-white font-semibold mb-1">Phone</h3>
-                  <p className="text-slate-400">+1 (555) 123-4567</p>
+                  <p className="text-slate-400">+91 9604788111</p>
                 </div>
               </div>
 
@@ -94,7 +94,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-white font-semibold mb-1">Location</h3>
-                  <p className="text-slate-400">San Francisco, CA</p>
+                  <p className="text-slate-400">Chh Sambhaji Nagar, MH, India</p>
                 </div>
               </div>
             </div>
