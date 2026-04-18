@@ -10,9 +10,10 @@ const serviceLinks = [
 
 const companyLinks = [
   { to: '/about', label: 'About Us' },
+  { to: '/pricing', label: 'Pricing' },
+  { to: '/roi-calculator', label: 'ROI Calculator' },
   { to: '/careers', label: 'Careers' },
   { to: '/contact', label: 'Contact' },
-  { to: '/admin', label: 'Admin' },
 ];
 
 const socialLinks = [

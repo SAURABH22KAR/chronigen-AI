@@ -11,6 +11,8 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Careers from './pages/Careers';
 import Admin from './pages/Admin';
+import Pricing from './pages/Pricing';
+import ROICalculator from './pages/ROICalculator';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -34,6 +36,8 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/careers" element={<Careers />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/roi-calculator" element={<ROICalculator />} />
           </Routes>
         </main>
         <Footer />
