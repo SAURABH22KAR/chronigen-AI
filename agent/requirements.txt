@@ -1,0 +1,6 @@
+anthropic
+rich
+duckduckgo-search
+black
+ruff
+pytest

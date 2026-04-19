@@ -18,6 +18,7 @@ export default function Navbar() {
   const navLinks = [
     { to: '/services', label: 'Services' },
     { to: '/demo', label: 'Live Demo' },
+    { to: '/chrono', label: 'Chrono AI', highlight: true },
     { to: '/pricing', label: 'Pricing' },
     { to: '/roi-calculator', label: 'ROI Calculator' },
     { to: '/about', label: 'About' },
@@ -56,22 +57,32 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`relative px-4 py-2 text-sm font-medium transition-all duration-200 group ${
-                  isActive(link.to) ? 'text-white' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                {link.label}
-                <span
-                  className={`absolute bottom-0 left-4 right-4 h-0.5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-300 ${
-                    isActive(link.to)
-                      ? 'opacity-100 scale-x-100'
-                      : 'opacity-0 scale-x-0 group-hover:opacity-60 group-hover:scale-x-100'
+              link.highlight ? (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="relative px-3 py-1.5 text-sm font-semibold text-cyan-400 border border-cyan-500/30 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-all duration-200 mx-1"
+                >
+                  ✦ {link.label}
+                </Link>
+              ) : (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`relative px-4 py-2 text-sm font-medium transition-all duration-200 group ${
+                    isActive(link.to) ? 'text-white' : 'text-slate-400 hover:text-white'
                   }`}
-                />
-              </Link>
+                >
+                  {link.label}
+                  <span
+                    className={`absolute bottom-0 left-4 right-4 h-0.5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-300 ${
+                      isActive(link.to)
+                        ? 'opacity-100 scale-x-100'
+                        : 'opacity-0 scale-x-0 group-hover:opacity-60 group-hover:scale-x-100'
+                    }`}
+                  />
+                </Link>
+              )
             ))}
           </div>
 
