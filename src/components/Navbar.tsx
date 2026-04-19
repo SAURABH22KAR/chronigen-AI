@@ -17,6 +17,7 @@ export default function Navbar() {
 
   const navLinks = [
     { to: '/services', label: 'Services' },
+    { to: '/demo', label: 'Live Demo' },
     { to: '/pricing', label: 'Pricing' },
     { to: '/roi-calculator', label: 'ROI Calculator' },
     { to: '/about', label: 'About' },

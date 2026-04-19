@@ -14,6 +14,7 @@ import Admin from './pages/Admin';
 import Pricing from './pages/Pricing';
 import ROICalculator from './pages/ROICalculator';
 import AIReceptionist from './pages/AIReceptionist';
+import Demo from './pages/Demo';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -40,6 +41,7 @@ function App() {
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/roi-calculator" element={<ROICalculator />} />
             <Route path="/services/ai-receptionist" element={<AIReceptionist />} />
+            <Route path="/demo" element={<Demo />} />
           </Routes>
         </main>
         <Footer />

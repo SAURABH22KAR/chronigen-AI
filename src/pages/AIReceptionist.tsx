@@ -175,18 +175,18 @@ export default function AIReceptionist() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/contact"
+              to="/demo"
               className="btn-gradient flex items-center justify-center gap-2 text-white font-semibold px-8 py-4 rounded-xl"
             >
               <Zap size={16} />
-              Book Free Demo
+              Try Live Demo
               <ArrowRight size={16} />
             </Link>
             <Link
-              to="/roi-calculator"
+              to="/contact"
               className="flex items-center justify-center gap-2 border border-white/10 bg-white/5 text-white font-semibold px-8 py-4 rounded-xl hover:bg-white/10 transition-colors"
             >
-              Calculate Your Savings
+              Book Free Consultation
             </Link>
           </div>
 
