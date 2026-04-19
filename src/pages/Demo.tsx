@@ -265,6 +265,9 @@ export default function Demo() {
     }, delay);
   }
 
+  const activeBiz = selectedBiz;
+  const BizIcon = selectedBiz?.icon ?? (() => null);
+
   return (
     <div className="min-h-screen pt-16" style={{ background: '#030712' }}>
       {/* Header */}
@@ -317,11 +320,11 @@ export default function Demo() {
                   {/* Chat header */}
                   <div className="flex items-center justify-between px-5 py-4 border-b border-white/8 bg-white/3">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${selectedBiz!.bg} ${selectedBiz!.border}`}>
-                        <selectedBiz!.icon size={18} className={selectedBiz!.color} />
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${activeBiz!.bg} ${activeBiz!.border}`}>
+                        <BizIcon size={18} className={activeBiz!.color} />
                       </div>
                       <div>
-                        <p className="text-white font-semibold text-sm">{selectedBiz!.name}</p>
+                        <p className="text-white font-semibold text-sm">{activeBiz!.name}</p>
                         <div className="flex items-center gap-1.5">
                           <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                           <span className="text-green-400 text-xs">AI Receptionist Online</span>
@@ -347,7 +350,7 @@ export default function Demo() {
                   {/* Quick replies */}
                   {messages.length <= 2 && !typing && (
                     <div className="px-5 pb-3 flex flex-wrap gap-2">
-                      {(QUICK_REPLIES[selectedBiz!.id] ?? QUICK_REPLIES.generic).map((q) => (
+                      {(QUICK_REPLIES[activeBiz!.id] ?? QUICK_REPLIES.generic).map((q) => (
                         <button
                           key={q}
                           onClick={() => sendMessage(q)}
