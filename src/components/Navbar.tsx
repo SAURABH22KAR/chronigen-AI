@@ -21,6 +21,7 @@ export default function Navbar() {
     { to: '/pricing', label: 'Pricing' },
     { to: '/roi-calculator', label: 'ROI Calculator' },
     { to: '/about', label: 'About' },
+    { to: '/careers', label: 'Careers' },
     { to: '/contact', label: 'Contact' },
   ];
 
