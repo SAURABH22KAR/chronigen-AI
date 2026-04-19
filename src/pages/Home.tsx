@@ -1,4 +1,4 @@
-import { Quote, Star, ArrowRight, CheckCircle, Cpu, Globe, Lock, TrendingUp, Zap, Bot, MessageSquare, Layers } from 'lucide-react';
+import { Quote, Star, ArrowRight, CheckCircle, Cpu, Globe, Lock, TrendingUp, Zap, Bot, MessageSquare, Layers, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import Hero from '../components/Hero';
@@ -64,6 +64,15 @@ const steps = [
 
 const services = [
   {
+    icon: Phone,
+    title: 'AI Receptionist',
+    desc: 'An AI receptionist that answers calls, books appointments, and qualifies leads 24/7 — for a fraction of human cost.',
+    href: '/services/ai-receptionist',
+    features: ['Answers calls 24/7', 'Books appointments', 'Qualifies leads', 'Live in 48hrs'],
+    color: 'green',
+    badge: 'New — #1 Pick',
+  },
+  {
     icon: Bot,
     title: 'AI Agents',
     desc: 'Autonomous agents that execute complex, multi-step workflows around the clock with zero downtime.',
@@ -80,15 +89,6 @@ const services = [
     features: ['NLP powered', 'Multi-channel', '98% satisfaction', 'Human handoff'],
     color: 'blue',
     badge: 'Best ROI',
-  },
-  {
-    icon: Layers,
-    title: 'Custom AI',
-    desc: 'End-to-end custom AI solutions — from model training to production deployment — built for your exact needs.',
-    href: '/services',
-    features: ['Custom models', 'Private deployment', 'Full IP ownership', 'White-label'],
-    color: 'cyan',
-    badge: 'Enterprise',
   },
 ];
 
@@ -157,6 +157,13 @@ const colorMap: Record<string, { badge: string; icon: string; border: string; bg
     border: 'hover:border-cyan-500/40',
     bg: 'hover:bg-cyan-500/5',
     check: 'text-cyan-400',
+  },
+  green: {
+    badge: 'bg-green-500/15 text-green-300 border-green-500/30',
+    icon: 'text-green-400 bg-green-500/10 border-green-500/20',
+    border: 'hover:border-green-500/40',
+    bg: 'hover:bg-green-500/5',
+    check: 'text-green-400',
   },
 };
 

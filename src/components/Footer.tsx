@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom';
 import { Twitter, Linkedin, Github, Mail, Zap, MapPin, Phone } from 'lucide-react';
 
 const serviceLinks = [
+  { to: '/services/ai-receptionist', label: 'AI Receptionist' },
   { to: '/services/ai-agents', label: 'AI Agents' },
   { to: '/services/chatbots', label: 'AI Chatbots' },
   { to: '/services', label: 'Custom Solutions' },
-  { to: '/services', label: 'Enterprise AI' },
 ];
 
 const companyLinks = [

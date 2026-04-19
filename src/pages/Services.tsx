@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Bot, MessageSquare, Zap, Brain, Clock, TrendingUp, ArrowRight } from 'lucide-react';
+import { Bot, MessageSquare, Zap, Brain, Clock, TrendingUp, ArrowRight, Phone, Calendar, Star } from 'lucide-react';
 
 export default function ServicesPage() {
   return (
@@ -13,6 +13,39 @@ export default function ServicesPage() {
             Comprehensive AI solutions designed to elevate your business operations
           </p>
         </div>
+
+        {/* AI Receptionist — Featured */}
+        <Link
+          to="/services/ai-receptionist"
+          className="group block bg-gradient-to-br from-green-900/30 to-slate-900 border border-green-500/40 rounded-2xl p-8 mb-8 hover:border-green-500/70 transition-all hover:shadow-xl hover:shadow-green-500/10 cursor-pointer"
+        >
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="flex items-center space-x-4">
+              <div className="bg-green-600/20 p-4 rounded-xl group-hover:bg-green-600/30 transition-colors">
+                <Phone className="text-green-400" size={40} />
+              </div>
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <h2 className="text-2xl font-bold text-white">AI Receptionist</h2>
+                  <span className="text-xs font-bold bg-green-500/15 text-green-300 border border-green-500/30 px-3 py-1 rounded-full">New — #1 Pick</span>
+                </div>
+                <p className="text-slate-300">Answers calls, books appointments & qualifies leads 24/7 — live in 48 hours</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-3 md:flex-col md:items-end">
+              {['Answers calls 24/7', 'Books appointments', 'Live in 48hrs'].map((f) => (
+                <span key={f} className="flex items-center gap-1.5 text-xs text-green-300">
+                  <Star size={11} className="fill-green-400 text-green-400" />
+                  {f}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center text-green-400 group-hover:text-green-300 transition-colors mt-6">
+            <span>See How It Works</span>
+            <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
           <Link
