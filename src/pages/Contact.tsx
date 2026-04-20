@@ -32,8 +32,7 @@ export default function ContactPage() {
       setSubmitStatus('success');
       setFormData({ name: '', email: '', company: '', message: '' });
       setTimeout(() => setSubmitStatus('idle'), 5000);
-    } catch (error) {
-      console.error('Error submitting form:', error);
+    } catch {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);

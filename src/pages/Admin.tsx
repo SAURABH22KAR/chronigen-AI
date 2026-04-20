@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Mail, Trash2, RefreshCw, Lock, Eye, EyeOff } from 'lucide-react';
 
-const ADMIN_PASSWORD = 'chronigen@admin';
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD as string;
 
 function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
   const [value, setValue] = useState('');

@@ -3,11 +3,6 @@ import { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChatBot from './components/ChatBot';
-
-function useIsChronoPage() {
-  const { pathname } = useLocation();
-  return pathname === '/chrono';
-}
 import Home from './pages/Home';
 import Services from './pages/Services';
 import AIAgents from './pages/AIAgents';
@@ -21,6 +16,11 @@ import ROICalculator from './pages/ROICalculator';
 import AIReceptionist from './pages/AIReceptionist';
 import Demo from './pages/Demo';
 import ChronoPage from './pages/ChronoPage';
+
+function useIsChronoPage() {
+  const { pathname } = useLocation();
+  return pathname === '/chrono';
+}
 
 function ScrollToTop() {
   const { pathname } = useLocation();
