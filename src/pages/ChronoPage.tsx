@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
-import { Send, Sparkles, Code, Brain, BookOpen, Lightbulb, RotateCcw } from 'lucide-react';
+import { Send, Sparkles, Code, Brain, BookOpen, Lightbulb, RotateCcw, Copy, Check } from 'lucide-react';
 
 type Role = 'user' | 'assistant';
 
@@ -9,41 +9,155 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  { icon: Code,      label: 'Debug my code',        prompt: 'Help me debug this Python function that should reverse a linked list but keeps throwing an error.' },
-  { icon: Brain,     label: 'Explain a concept',     prompt: 'Explain how transformer neural networks work, step by step, in simple terms.' },
-  { icon: BookOpen,  label: 'Write something',       prompt: 'Write a professional email to a client explaining a project delay due to unexpected technical challenges.' },
-  { icon: Lightbulb, label: 'Solve a problem',       prompt: 'What is the most efficient algorithm to find the longest common subsequence of two strings? Show code.' },
+  { icon: Code,      label: 'Debug my code',      prompt: 'Help me debug this Python function that should reverse a linked list but keeps throwing an error.' },
+  { icon: Brain,     label: 'Explain a concept',   prompt: 'Explain how transformer neural networks work, step by step, in simple terms.' },
+  { icon: BookOpen,  label: 'Write something',     prompt: 'Write a professional email to a client explaining a project delay due to unexpected technical challenges.' },
+  { icon: Lightbulb, label: 'Solve a problem',     prompt: 'What is the most efficient algorithm to find the longest common subsequence of two strings? Show code.' },
 ];
+
+// ── Markdown renderer ────────────────────────────────────────────────────────
+
+function CodeBlock({ lang, code }: { lang: string; code: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(code).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <div className="my-3 rounded-xl overflow-hidden border border-white/10">
+      <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
+        <span className="text-white/40 text-xs font-mono">{lang || 'plaintext'}</span>
+        <button
+          onClick={copy}
+          className="flex items-center gap-1 text-white/40 hover:text-white/70 text-xs transition-colors"
+        >
+          {copied ? <Check size={12} /> : <Copy size={12} />}
+          {copied ? 'Copied' : 'Copy'}
+        </button>
+      </div>
+      <pre className="bg-black/50 p-4 overflow-x-auto text-sm font-mono text-cyan-300 whitespace-pre">
+        {code}
+      </pre>
+    </div>
+  );
+}
+
+function renderInline(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[\s\S]+?\*\*|\*[\s\S]+?\*|`[^`]+`)/g);
+  return parts.map((p, i) => {
+    if (p.startsWith('**') && p.endsWith('**') && p.length > 4)
+      return <strong key={i} className="font-semibold text-white">{p.slice(2, -2)}</strong>;
+    if (p.startsWith('*') && p.endsWith('*') && p.length > 2)
+      return <em key={i} className="italic text-gray-300">{p.slice(1, -1)}</em>;
+    if (p.startsWith('`') && p.endsWith('`') && p.length > 2)
+      return (
+        <code key={i} className="bg-black/50 text-cyan-300 px-1.5 py-0.5 rounded text-xs font-mono border border-white/10">
+          {p.slice(1, -1)}
+        </code>
+      );
+    return <span key={i}>{p}</span>;
+  });
+}
+
+function renderTextBlock(text: string, key: number): React.ReactNode {
+  const lines = text.split('\n');
+  const nodes: React.ReactNode[] = [];
+  let listLines: string[] = [];
+  let isOrdered = false;
+
+  const flushList = (k: string) => {
+    if (!listLines.length) return;
+    const Tag = isOrdered ? 'ol' : 'ul';
+    const cls = isOrdered
+      ? 'list-decimal pl-5 my-2 space-y-0.5 text-gray-200'
+      : 'list-disc pl-5 my-2 space-y-0.5 text-gray-200';
+    nodes.push(
+      <Tag key={k} className={cls}>
+        {listLines.map((l, i) => (
+          <li key={i} className="leading-relaxed">{renderInline(l)}</li>
+        ))}
+      </Tag>
+    );
+    listLines = [];
+  };
+
+  lines.forEach((line, i) => {
+    if (line.startsWith('### ')) {
+      flushList(`fl${i}`);
+      nodes.push(<h3 key={i} className="text-sm font-semibold text-white mt-3 mb-0.5">{renderInline(line.slice(4))}</h3>);
+    } else if (line.startsWith('## ')) {
+      flushList(`fl${i}`);
+      nodes.push(<h2 key={i} className="text-base font-bold text-white mt-4 mb-1">{renderInline(line.slice(3))}</h2>);
+    } else if (line.startsWith('# ')) {
+      flushList(`fl${i}`);
+      nodes.push(<h1 key={i} className="text-lg font-bold text-white mt-4 mb-1">{renderInline(line.slice(2))}</h1>);
+    } else if (/^[-*] /.test(line)) {
+      if (listLines.length && isOrdered) flushList(`fl${i}`);
+      isOrdered = false;
+      listLines.push(line.slice(2));
+    } else if (/^\d+\. /.test(line)) {
+      if (listLines.length && !isOrdered) flushList(`fl${i}`);
+      isOrdered = true;
+      listLines.push(line.replace(/^\d+\. /, ''));
+    } else if (line.trim() === '') {
+      flushList(`fl${i}`);
+    } else {
+      flushList(`fl${i}`);
+      nodes.push(<p key={i} className="leading-relaxed">{renderInline(line)}</p>);
+    }
+  });
+
+  flushList('end');
+  return <div key={key}>{nodes}</div>;
+}
+
+function renderMarkdown(text: string): React.ReactNode {
+  const segments: { type: 'text' | 'code'; lang?: string; content: string }[] = [];
+  const regex = /```([\w]*)\n([\s\S]*?)```/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+
+  while ((m = regex.exec(text)) !== null) {
+    if (m.index > last) segments.push({ type: 'text', content: text.slice(last, m.index) });
+    segments.push({ type: 'code', lang: m[1], content: m[2] });
+    last = m.index + m[0].length;
+  }
+
+  const tail = text.slice(last);
+  if (tail) {
+    // Gracefully handle unclosed code block while streaming
+    const openIdx = tail.lastIndexOf('```');
+    if (openIdx !== -1) {
+      const before = tail.slice(0, openIdx);
+      const inside = tail.slice(openIdx + 3);
+      const firstNewline = inside.indexOf('\n');
+      const lang = firstNewline > -1 ? inside.slice(0, firstNewline).trim() : '';
+      const code = firstNewline > -1 ? inside.slice(firstNewline + 1) : '';
+      if (before) segments.push({ type: 'text', content: before });
+      segments.push({ type: 'code', lang, content: code });
+    } else {
+      segments.push({ type: 'text', content: tail });
+    }
+  }
+
+  return (
+    <>
+      {segments.map((seg, i) =>
+        seg.type === 'code'
+          ? <CodeBlock key={i} lang={seg.lang ?? ''} code={seg.content} />
+          : renderTextBlock(seg.content, i)
+      )}
+    </>
+  );
+}
+
+// ── Bubbles ──────────────────────────────────────────────────────────────────
 
 function MessageBubble({ msg }: { msg: Message }) {
   const isUser = msg.role === 'user';
-
-  // Simple markdown-like rendering: code blocks and bold
-  const renderContent = (text: string) => {
-    const blocks = text.split(/(```[\s\S]*?```)/g);
-    return blocks.map((block, i) => {
-      if (block.startsWith('```') && block.endsWith('```')) {
-        const lines = block.slice(3, -3).split('\n');
-        const lang = lines[0].trim();
-        const code = lines.slice(1).join('\n');
-        return (
-          <pre key={i} className="bg-black/40 border border-white/10 rounded-lg p-3 my-2 overflow-x-auto text-sm font-mono text-cyan-300 whitespace-pre-wrap">
-            {lang && <div className="text-white/30 text-xs mb-2">{lang}</div>}
-            {code || lines[0]}
-          </pre>
-        );
-      }
-      return (
-        <span key={i} className="whitespace-pre-wrap">
-          {block}
-        </span>
-      );
-    });
-  };
-
   return (
     <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-      {/* Avatar */}
       <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
         ${isUser
           ? 'bg-cyan-500/20 border border-cyan-500/40 text-cyan-400'
@@ -52,15 +166,13 @@ function MessageBubble({ msg }: { msg: Message }) {
       >
         {isUser ? 'U' : <Sparkles size={14} />}
       </div>
-
-      {/* Bubble */}
       <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed
         ${isUser
-          ? 'bg-cyan-500/15 border border-cyan-500/25 text-white rounded-tr-sm'
+          ? 'bg-cyan-500/15 border border-cyan-500/25 text-white rounded-tr-sm whitespace-pre-wrap'
           : 'bg-white/5 border border-white/10 text-gray-200 rounded-tl-sm'
         }`}
       >
-        {renderContent(msg.content)}
+        {isUser ? msg.content : renderMarkdown(msg.content)}
       </div>
     </div>
   );
@@ -85,8 +197,11 @@ function TypingDots() {
   );
 }
 
+// ── Page ─────────────────────────────────────────────────────────────────────
+
 export default function ChronoPage() {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [streamingContent, setStreamingContent] = useState('');
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -95,9 +210,8 @@ export default function ChronoPage() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
+  }, [messages, streamingContent, loading]);
 
-  // Auto-resize textarea
   useEffect(() => {
     const ta = textareaRef.current;
     if (!ta) return;
@@ -110,30 +224,59 @@ export default function ChronoPage() {
     if (!content || loading) return;
 
     const userMsg: Message = { role: 'user', content };
-    const newMessages: Message[] = [...messages, userMsg];
-    setMessages(newMessages);
+    const history: Message[] = [...messages, userMsg];
+    setMessages(history);
     setInput('');
     setLoading(true);
+    setStreamingContent('');
     setError('');
+
+    let fullContent = '';
 
     try {
       const res = await fetch('/api/chrono', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({ messages: history }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
+        const data = await res.json();
         throw new Error(data.error || 'Failed to get response');
       }
 
-      setMessages(prev => [...prev, { role: 'assistant', content: data.message }]);
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split('\n');
+        buf = lines.pop() ?? '';
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const raw = line.slice(6).trim();
+          if (raw === '[DONE]') continue;
+          try {
+            const event = JSON.parse(raw);
+            if (event.type === 'content_block_delta' && event.delta?.type === 'text_delta') {
+              fullContent += event.delta.text;
+              setStreamingContent(fullContent);
+            }
+          } catch { /* partial chunk */ }
+        }
+      }
+
+      setMessages(prev => [...prev, { role: 'assistant', content: fullContent || '(no response)' }]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
+      setStreamingContent('');
     }
   };
 
@@ -144,7 +287,7 @@ export default function ChronoPage() {
     }
   };
 
-  const isEmpty = messages.length === 0;
+  const isEmpty = messages.length === 0 && !loading;
 
   return (
     <div className="flex flex-col h-screen" style={{ background: '#030712' }}>
@@ -160,7 +303,7 @@ export default function ChronoPage() {
         </div>
         {messages.length > 0 && (
           <button
-            onClick={() => { setMessages([]); setError(''); }}
+            onClick={() => { setMessages([]); setError(''); setStreamingContent(''); }}
             className="flex items-center gap-1.5 text-white/40 hover:text-white/70 text-xs transition-colors"
           >
             <RotateCcw size={12} />
@@ -183,8 +326,6 @@ export default function ChronoPage() {
               <p className="text-white/50 text-sm text-center max-w-md mb-10">
                 An AI assistant by ChronigenAI — ready to help with code, math, writing, research, and complex problems.
               </p>
-
-              {/* Suggestion cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
                 {SUGGESTIONS.map(({ icon: Icon, label, prompt }) => (
                   <button
@@ -208,7 +349,13 @@ export default function ChronoPage() {
             {messages.map((msg, i) => (
               <MessageBubble key={i} msg={msg} />
             ))}
-            {loading && <TypingDots />}
+
+            {/* Live streaming bubble */}
+            {loading && streamingContent === '' && <TypingDots />}
+            {loading && streamingContent !== '' && (
+              <MessageBubble msg={{ role: 'assistant', content: streamingContent }} />
+            )}
+
             {error && (
               <div className="text-center">
                 <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 inline-block">

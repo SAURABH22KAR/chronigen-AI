@@ -20,8 +20,8 @@ You are knowledgeable, precise, and helpful across a wide range of domains:
 Your style:
 - Be clear and direct — no unnecessary filler
 - Show step-by-step reasoning for complex problems
-- Use code blocks when sharing code snippets
-- Use bullet points and structure for complex answers
+- Use code blocks with the correct language tag when sharing code snippets
+- Use markdown: headers for sections, bullet points for lists, **bold** for emphasis
 - Be honest when unsure — say so rather than guessing
 - Keep responses focused and appropriately concise
 
@@ -57,33 +57,34 @@ export default async function handler(req: Request): Promise<Response> {
       headers: {
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'prompt-caching-2024-07-31',
         'content-type': 'application/json',
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 4096,
-        system: SYSTEM_PROMPT,
+        max_tokens: 8192,
+        system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
         messages,
+        stream: true,
       }),
     });
 
-    const data = await upstream.json() as {
-      content?: { text: string }[];
-      usage?: unknown;
-      error?: { message: string };
-    };
-
     if (!upstream.ok) {
+      const data = await upstream.json() as { error?: { message: string } };
       return Response.json(
         { error: data.error?.message ?? 'Anthropic API error' },
         { status: upstream.status, headers: CORS }
       );
     }
 
-    return Response.json(
-      { message: data.content?.[0]?.text ?? '(no response)', usage: data.usage },
-      { headers: CORS }
-    );
+    return new Response(upstream.body, {
+      headers: {
+        ...CORS,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'X-Accel-Buffering': 'no',
+      },
+    });
   } catch {
     return Response.json({ error: 'Failed to reach AI service' }, { status: 500, headers: CORS });
   }
