@@ -7,7 +7,7 @@ const plans = [
   {
     name: 'Starter',
     icon: Zap,
-    price: 499,
+    price: 29999,
     description: 'Perfect for small businesses taking their first step into AI.',
     color: 'blue',
     features: [
@@ -25,7 +25,7 @@ const plans = [
   {
     name: 'Growth',
     icon: Rocket,
-    price: 1499,
+    price: 34999,
     description: 'For scaling teams that need more power and fewer limits.',
     color: 'purple',
     features: [
@@ -120,7 +120,7 @@ function PricingCard({ plan, annual, index }: { plan: typeof plans[0]; annual: b
   const { ref, inView } = useInView();
   const c = colorMap[plan.color];
   const displayPrice = plan.price
-    ? annual ? Math.round(plan.price * 10 / 12) : plan.price
+    ? annual ? Math.round(plan.price * 0.83) : plan.price
     : null;
 
   return (
@@ -150,7 +150,7 @@ function PricingCard({ plan, annual, index }: { plan: typeof plans[0]; annual: b
       <div className="mb-8">
         {displayPrice ? (
           <div className="flex items-end gap-1.5">
-            <span className="text-4xl font-extrabold text-white">${displayPrice.toLocaleString()}</span>
+            <span className="text-4xl font-extrabold text-white">₹{displayPrice.toLocaleString('en-IN')}</span>
             <span className="text-slate-500 text-sm mb-1.5">/mo{annual ? ' · billed annually' : ''}</span>
           </div>
         ) : (

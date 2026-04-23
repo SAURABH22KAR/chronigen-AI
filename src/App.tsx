@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChatBot from './components/ChatBot';
+import WhatsAppButton from './components/WhatsAppButton';
 import Home from './pages/Home';
 import Services from './pages/Services';
 import AIAgents from './pages/AIAgents';
@@ -52,6 +53,7 @@ function AppShell() {
       </main>
       {!isChrono && <Footer />}
       {!isChrono && <ChatBot />}
+      {!isChrono && <WhatsAppButton />}
     </div>
   );
 }

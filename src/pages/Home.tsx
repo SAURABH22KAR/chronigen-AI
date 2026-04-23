@@ -1,4 +1,4 @@
-import { Quote, Star, ArrowRight, CheckCircle, Cpu, Globe, Lock, TrendingUp, Zap, Bot, MessageSquare, Layers, Phone } from 'lucide-react';
+import { Quote, Star, ArrowRight, CheckCircle, Cpu, Globe, Lock, TrendingUp, Zap, Bot, MessageSquare, Layers, Phone, HeartPulse, ShoppingBag, UtensilsCrossed, Truck, Building2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import Hero from '../components/Hero';
@@ -334,6 +334,110 @@ export default function Home() {
                 <p className="text-slate-400 text-xs mt-2">{stat.label}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Industries We Serve ── */}
+      <section className="py-28 relative" style={{ background: '#030712' }}>
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-green-500/20 to-transparent" />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-full px-4 py-1.5 mb-5">
+              <Building2 size={13} className="text-green-400" />
+              <span className="text-green-300 text-sm font-medium">Industries We Serve</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4">
+              AI That Works for{' '}
+              <span className="gradient-text">Your Industry</span>
+            </h2>
+            <p className="text-slate-400 text-lg max-w-xl mx-auto">
+              We build AI solutions tailored to how your industry actually works.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              {
+                icon: HeartPulse,
+                industry: 'Healthcare & Clinics',
+                useCase: 'AI receptionist handles appointment booking, patient queries, and follow-up reminders — 24/7.',
+                outcome: '70% fewer missed calls',
+                color: 'rose',
+              },
+              {
+                icon: ShoppingBag,
+                industry: 'Retail & E-commerce',
+                useCase: 'AI chatbot answers product questions, tracks orders, and recovers abandoned carts automatically.',
+                outcome: '3× faster response time',
+                color: 'blue',
+              },
+              {
+                icon: UtensilsCrossed,
+                industry: 'Restaurants & F&B',
+                useCase: 'AI agent takes reservations, handles menu queries, and sends order status updates via WhatsApp.',
+                outcome: '40% reduction in staff workload',
+                color: 'orange',
+              },
+              {
+                icon: Truck,
+                industry: 'Logistics & Transport',
+                useCase: 'AI bot gives real-time shipment updates, handles delivery queries, and escalates issues instantly.',
+                outcome: '80% of queries resolved automatically',
+                color: 'cyan',
+              },
+              {
+                icon: Building2,
+                industry: 'Real Estate',
+                useCase: 'AI agent qualifies leads, answers property queries, and schedules site visits without human intervention.',
+                outcome: '5× more qualified leads',
+                color: 'purple',
+              },
+              {
+                icon: Cpu,
+                industry: 'IT & SaaS Companies',
+                useCase: 'AI handles tier-1 support tickets, onboarding questions, and feature FAQs across Slack, email, and chat.',
+                outcome: '60% reduction in support costs',
+                color: 'green',
+              },
+            ].map(({ icon: Icon, industry, useCase, outcome, color }) => {
+              const colorStyles: Record<string, { badge: string; icon: string; border: string }> = {
+                rose:   { badge: 'bg-rose-500/10 text-rose-300 border-rose-500/20',     icon: 'text-rose-400 bg-rose-500/10 border-rose-500/20',     border: 'hover:border-rose-500/30' },
+                blue:   { badge: 'bg-blue-500/10 text-blue-300 border-blue-500/20',     icon: 'text-blue-400 bg-blue-500/10 border-blue-500/20',     border: 'hover:border-blue-500/30' },
+                orange: { badge: 'bg-orange-500/10 text-orange-300 border-orange-500/20', icon: 'text-orange-400 bg-orange-500/10 border-orange-500/20', border: 'hover:border-orange-500/30' },
+                cyan:   { badge: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20',     icon: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20',     border: 'hover:border-cyan-500/30' },
+                purple: { badge: 'bg-purple-500/10 text-purple-300 border-purple-500/20', icon: 'text-purple-400 bg-purple-500/10 border-purple-500/20', border: 'hover:border-purple-500/30' },
+                green:  { badge: 'bg-green-500/10 text-green-300 border-green-500/20',  icon: 'text-green-400 bg-green-500/10 border-green-500/20',  border: 'hover:border-green-500/30' },
+              };
+              const c = colorStyles[color];
+              return (
+                <div
+                  key={industry}
+                  className={`glow-card rounded-2xl p-6 flex flex-col gap-4 transition-all duration-300 ${c.border}`}
+                >
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center border ${c.icon}`}>
+                    <Icon size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold text-base mb-2">{industry}</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed">{useCase}</p>
+                  </div>
+                  <span className={`self-start text-xs font-semibold px-3 py-1 rounded-full border ${c.badge}`}>
+                    {outcome}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              to="/contact"
+              className="btn-gradient inline-flex items-center gap-2 text-white px-8 py-3.5 rounded-xl font-semibold"
+            >
+              Get a Free Industry Demo
+              <ArrowRight size={15} />
+            </Link>
           </div>
         </div>
       </section>
