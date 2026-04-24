@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
-import { Send, Sparkles, Code, Brain, BookOpen, Lightbulb, RotateCcw, Copy, Check } from 'lucide-react';
+import { Send, Sparkles, Code, Brain, BookOpen, Lightbulb, RotateCcw, Copy, Check, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 
 type Role = 'user' | 'assistant';
 
@@ -14,6 +14,15 @@ const SUGGESTIONS = [
   { icon: BookOpen,  label: 'Write something',     prompt: 'Write a professional email to a client explaining a project delay due to unexpected technical challenges.' },
   { icon: Lightbulb, label: 'Solve a problem',     prompt: 'What is the most efficient algorithm to find the longest common subsequence of two strings? Show code.' },
 ];
+
+// Browser Speech API types
+type SpeechRecognitionType = typeof window extends { SpeechRecognition: infer T } ? T : never;
+declare global {
+  interface Window {
+    SpeechRecognition: SpeechRecognitionType;
+    webkitSpeechRecognition: SpeechRecognitionType;
+  }
+}
 
 // ── Markdown renderer ────────────────────────────────────────────────────────
 
@@ -126,7 +135,6 @@ function renderMarkdown(text: string): React.ReactNode {
 
   const tail = text.slice(last);
   if (tail) {
-    // Gracefully handle unclosed code block while streaming
     const openIdx = tail.lastIndexOf('```');
     if (openIdx !== -1) {
       const before = tail.slice(0, openIdx);
@@ -154,6 +162,46 @@ function renderMarkdown(text: string): React.ReactNode {
 
 // ── Bubbles ──────────────────────────────────────────────────────────────────
 
+function SpeakButton({ text }: { text: string }) {
+  const [speaking, setSpeaking] = useState(false);
+
+  const toggle = () => {
+    if (speaking) {
+      window.speechSynthesis.cancel();
+      setSpeaking(false);
+      return;
+    }
+    // Strip markdown for cleaner speech
+    const plain = text
+      .replace(/```[\s\S]*?```/g, 'code block')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/\*\*(.+?)\*\*/g, '$1')
+      .replace(/\*(.+?)\*/g, '$1')
+      .replace(/^#+\s+/gm, '')
+      .replace(/^[-*]\s+/gm, '')
+      .replace(/^\d+\.\s+/gm, '')
+      .trim();
+
+    const utterance = new SpeechSynthesisUtterance(plain);
+    utterance.rate = 1.05;
+    utterance.pitch = 1;
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    window.speechSynthesis.speak(utterance);
+    setSpeaking(true);
+  };
+
+  return (
+    <button
+      onClick={toggle}
+      title={speaking ? 'Stop speaking' : 'Read aloud'}
+      className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-white/25 hover:text-cyan-400 transition-colors mt-1"
+    >
+      {speaking ? <VolumeX size={13} /> : <Volume2 size={13} />}
+    </button>
+  );
+}
+
 function MessageBubble({ msg }: { msg: Message }) {
   const isUser = msg.role === 'user';
   return (
@@ -166,7 +214,7 @@ function MessageBubble({ msg }: { msg: Message }) {
       >
         {isUser ? 'U' : <Sparkles size={14} />}
       </div>
-      <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed
+      <div className={`max-w-[78%] rounded-2xl px-4 py-3 text-sm leading-relaxed
         ${isUser
           ? 'bg-cyan-500/15 border border-cyan-500/25 text-white rounded-tr-sm whitespace-pre-wrap'
           : 'bg-white/5 border border-white/10 text-gray-200 rounded-tl-sm'
@@ -174,6 +222,7 @@ function MessageBubble({ msg }: { msg: Message }) {
       >
         {isUser ? msg.content : renderMarkdown(msg.content)}
       </div>
+      {!isUser && <SpeakButton text={msg.content} />}
     </div>
   );
 }
@@ -197,6 +246,54 @@ function TypingDots() {
   );
 }
 
+// ── Voice hook ────────────────────────────────────────────────────────────────
+
+function useSpeechInput(onTranscript: (t: string) => void, onFinal: (t: string) => void) {
+  const [listening, setListening] = useState(false);
+  const [supported, setSupported] = useState(false);
+  const recRef = useRef<InstanceType<typeof window.SpeechRecognition> | null>(null);
+
+  useEffect(() => {
+    setSupported(!!(window.SpeechRecognition || window.webkitSpeechRecognition));
+  }, []);
+
+  const start = () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+
+    const rec = new SR();
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.lang = 'en-US';
+
+    rec.onresult = (e: SpeechRecognitionEvent) => {
+      const transcript = Array.from(e.results)
+        .map(r => r[0].transcript)
+        .join('');
+      onTranscript(transcript);
+      if (e.results[e.results.length - 1].isFinal) {
+        onFinal(transcript);
+      }
+    };
+
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+
+    rec.start();
+    recRef.current = rec;
+    setListening(true);
+  };
+
+  const stop = () => {
+    recRef.current?.stop();
+    setListening(false);
+  };
+
+  const toggle = () => (listening ? stop() : start());
+
+  return { listening, supported, toggle, stop };
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ChronoPage() {
@@ -205,8 +302,14 @@ export default function ChronoPage() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [autoSpeak, setAutoSpeak] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const voice = useSpeechInput(
+    (t) => setInput(t),
+    (_t) => { /* auto-send on final if desired — currently user presses Send */ },
+  );
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -219,9 +322,27 @@ export default function ChronoPage() {
     ta.style.height = Math.min(ta.scrollHeight, 160) + 'px';
   }, [input]);
 
+  const speakText = (text: string) => {
+    if (!autoSpeak) return;
+    window.speechSynthesis.cancel();
+    const plain = text
+      .replace(/```[\s\S]*?```/g, 'code block')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/\*\*(.+?)\*\*/g, '$1')
+      .replace(/\*(.+?)\*/g, '$1')
+      .replace(/^#+\s+/gm, '')
+      .replace(/^[-*]\s+/gm, '')
+      .replace(/^\d+\.\s+/gm, '')
+      .trim();
+    const u = new SpeechSynthesisUtterance(plain);
+    u.rate = 1.05;
+    window.speechSynthesis.speak(u);
+  };
+
   const sendMessage = async (text?: string) => {
     const content = (text ?? input).trim();
     if (!content || loading) return;
+    voice.stop();
 
     const userMsg: Message = { role: 'user', content };
     const history: Message[] = [...messages, userMsg];
@@ -271,7 +392,9 @@ export default function ChronoPage() {
         }
       }
 
-      setMessages(prev => [...prev, { role: 'assistant', content: fullContent || '(no response)' }]);
+      const finalResponse = fullContent || '(no response)';
+      setMessages(prev => [...prev, { role: 'assistant', content: finalResponse }]);
+      speakText(finalResponse);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
@@ -301,15 +424,31 @@ export default function ChronoPage() {
           <span className="text-white font-semibold">Chrono</span>
           <span className="text-white/30 text-xs">by ChronigenAI</span>
         </div>
-        {messages.length > 0 && (
+        <div className="flex items-center gap-3">
+          {/* Auto-speak toggle */}
           <button
-            onClick={() => { setMessages([]); setError(''); setStreamingContent(''); }}
-            className="flex items-center gap-1.5 text-white/40 hover:text-white/70 text-xs transition-colors"
+            onClick={() => { setAutoSpeak(p => !p); window.speechSynthesis.cancel(); }}
+            title={autoSpeak ? 'Auto-speak on (click to turn off)' : 'Auto-speak off (click to enable)'}
+            className={`flex items-center gap-1.5 text-xs transition-colors px-2 py-1 rounded-lg border ${
+              autoSpeak
+                ? 'text-cyan-400 border-cyan-500/40 bg-cyan-500/10'
+                : 'text-white/40 border-white/10 hover:text-white/60'
+            }`}
           >
-            <RotateCcw size={12} />
-            New chat
+            {autoSpeak ? <Volume2 size={12} /> : <VolumeX size={12} />}
+            <span className="hidden sm:inline">{autoSpeak ? 'Speaking' : 'Muted'}</span>
           </button>
-        )}
+
+          {messages.length > 0 && (
+            <button
+              onClick={() => { setMessages([]); setError(''); setStreamingContent(''); window.speechSynthesis.cancel(); }}
+              className="flex items-center gap-1.5 text-white/40 hover:text-white/70 text-xs transition-colors"
+            >
+              <RotateCcw size={12} />
+              New chat
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Chat area */}
@@ -325,6 +464,7 @@ export default function ChronoPage() {
               <h1 className="text-2xl font-bold text-white mb-2">Hi, I'm Chrono</h1>
               <p className="text-white/50 text-sm text-center max-w-md mb-10">
                 An AI assistant by ChronigenAI — ready to help with code, math, writing, research, and complex problems.
+                {voice.supported && <span className="block mt-1 text-cyan-400/60">🎙 Voice input supported — tap the mic to speak</span>}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
                 {SUGGESTIONS.map(({ icon: Icon, label, prompt }) => (
@@ -371,17 +511,42 @@ export default function ChronoPage() {
       {/* Input bar */}
       <div className="flex-shrink-0 border-t border-white/5 px-4 py-4">
         <div className="max-w-3xl mx-auto">
-          <div className="flex items-end gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus-within:border-cyan-500/40 transition-colors">
+          <div className={`flex items-end gap-3 bg-white/5 border rounded-2xl px-4 py-3 transition-colors ${
+            voice.listening
+              ? 'border-red-500/50 shadow-[0_0_12px_rgba(239,68,68,0.15)]'
+              : 'border-white/10 focus-within:border-cyan-500/40'
+          }`}>
             <textarea
               ref={textareaRef}
               rows={1}
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask Chrono anything…"
+              placeholder={voice.listening ? 'Listening…' : 'Ask Chrono anything…'}
               className="flex-1 bg-transparent text-white placeholder-white/30 text-sm resize-none outline-none leading-relaxed"
               style={{ minHeight: '24px', maxHeight: '160px' }}
             />
+
+            {/* Mic button */}
+            {voice.supported && (
+              <button
+                onClick={voice.toggle}
+                disabled={loading}
+                title={voice.listening ? 'Stop listening' : 'Speak your message'}
+                className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
+                  voice.listening
+                    ? 'bg-red-500 hover:bg-red-400 animate-pulse'
+                    : 'bg-white/8 hover:bg-white/15 text-white/50 hover:text-white/80'
+                } disabled:opacity-40 disabled:cursor-not-allowed`}
+              >
+                {voice.listening
+                  ? <MicOff size={14} className="text-white" />
+                  : <Mic size={14} />
+                }
+              </button>
+            )}
+
+            {/* Send button */}
             <button
               onClick={() => sendMessage()}
               disabled={!input.trim() || loading}
@@ -390,8 +555,11 @@ export default function ChronoPage() {
               <Send size={14} className="text-white" />
             </button>
           </div>
+
           <p className="text-center text-white/20 text-xs mt-2">
-            Press Enter to send · Shift+Enter for new line
+            {voice.listening
+              ? 'Listening — speak now, then press Send or Enter'
+              : 'Press Enter to send · Shift+Enter for new line'}
           </p>
         </div>
       </div>
