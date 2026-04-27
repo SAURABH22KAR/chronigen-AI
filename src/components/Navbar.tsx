@@ -55,13 +55,13 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5 xl:gap-1">
             {navLinks.map((link) => (
               link.highlight ? (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="relative px-3 py-1.5 text-sm font-semibold text-cyan-400 border border-cyan-500/30 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-all duration-200 mx-1"
+                  className="relative px-2.5 py-1.5 text-xs xl:text-sm font-semibold text-cyan-400 border border-cyan-500/30 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 hover:border-cyan-500/50 transition-all duration-200 mx-0.5 whitespace-nowrap"
                 >
                   ✦ {link.label}
                 </Link>
@@ -69,13 +69,13 @@ export default function Navbar() {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`relative px-4 py-2 text-sm font-medium transition-all duration-200 group ${
+                  className={`relative px-2.5 xl:px-3 py-2 text-xs xl:text-sm font-medium transition-all duration-200 group whitespace-nowrap ${
                     isActive(link.to) ? 'text-white' : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   {link.label}
                   <span
-                    className={`absolute bottom-0 left-4 right-4 h-0.5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-300 ${
+                    className={`absolute bottom-0 left-2.5 right-2.5 h-0.5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-300 ${
                       isActive(link.to)
                         ? 'opacity-100 scale-x-100'
                         : 'opacity-0 scale-x-0 group-hover:opacity-60 group-hover:scale-x-100'
@@ -87,19 +87,19 @@ export default function Navbar() {
           </div>
 
           {/* CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3">
             <Link
               to="/contact"
-              className="btn-gradient flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl"
+              className="btn-gradient flex items-center gap-2 text-white text-xs xl:text-sm font-semibold px-4 xl:px-5 py-2.5 rounded-xl whitespace-nowrap"
             >
               <Zap size={14} />
               Get Started
             </Link>
           </div>
 
-          {/* Mobile toggle */}
+          {/* Mobile / tablet toggle */}
           <button
-            className="md:hidden text-slate-400 hover:text-white transition-colors p-2"
+            className="lg:hidden text-slate-400 hover:text-white transition-colors p-2"
             onClick={() => setIsMenuOpen((p) => !p)}
             aria-label="Toggle menu"
           >
@@ -108,10 +108,10 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile / tablet Menu */}
       <div
-        className={`md:hidden transition-all duration-300 overflow-hidden ${
-          isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        className={`lg:hidden transition-all duration-300 overflow-hidden ${
+          isMenuOpen ? 'max-h-[32rem] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
         <div className="bg-[#030712]/95 backdrop-blur-xl border-t border-white/5 px-4 py-4 space-y-1">
